@@ -1,41 +1,16 @@
-# VoxAI - Dashboard d'Analyse de Sentiment
+# React + Vite
 
-VoxAI est un outil d'analyse de sentiment intelligent doté d'une interface utilisateur dynamique (Glassmorphism) et d'un backend puissant propulsé par l'IA (NLP). Il permet aux entreprises d'analyser, classer et extraire des insights à partir de retours clients ou de commentaires en un clic.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Fonctionnalités Principales
-- **Importation CSV Intelligente** : Détection automatique des colonnes de texte et des notes clients, quel que soit le délimiteur.
-- **Analyse NLP Avancée** : Analyse des sentiments (Positif, Neutre, Négatif), extraction de mots-clés et détection des thèmes principaux en temps réel.
-- **Tableau de Bord Premium** : Design réactif avec effets de survol, animations, et graphiques interactifs (Recharts).
-- **Mode Clair / Sombre** : Basculez manuellement entre le thème clair et le mode sombre "Premium Glassmorphism".
-- **Gestion des Données** : Pagination intégrée (50 avis par page) et options de suppression pour un contrôle total.
+Currently, two official plugins are available:
 
-## Stack Technique
-- **Frontend** : React 18, Vite, Lucide-React, Recharts, CSS Vanilla (Architecture Theme-Ready).
-- **Backend** : FastAPI (Python), SQLAlchemy (SQLite), HuggingFace Transformers (NLP).
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Prérequis
-- Python 3.9+
-- Node.js 18+
+## React Compiler
 
-## Démarrage Rapide
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-### 1. Lancement du Backend
-```bash
-cd backend
-pip install -r requirements.txt
-python -m spacy download fr_core_news_sm
-python -m uvicorn main:app --host 127.0.0.1 --port 8000
-```
-L'API sera disponible sur : http://localhost:8000/docs
+## Expanding the ESLint configuration
 
-### 2. Lancement du Frontend
-Ouvrez un nouveau terminal et exécutez :
-```bash
-cd frontend-premium
-npm install
-npm run dev
-```
-L'application web sera disponible sur : http://localhost:5173
-
-## Auteur
-Développé dans le cadre d'un projet d'analyse de sentiment avec IA générative.
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
