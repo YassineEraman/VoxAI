@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+venv/
+.env
+
+# Database
+*.db
+
+# Node
+node_modules/
+frontend-premium/node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# AI Models cache
+*.bin
+*.safetensors
+
+# Temp files
+test_upload.csv
+test_csv_upload.py
+convert_to_pdf.py

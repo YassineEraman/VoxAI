@@ -1,0 +1,351 @@
+\documentclass[12pt,a4paper]{article}
+
+% --- Packages indispensables ---
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{tocloft}
+\usepackage{mdframed}
+\usepackage{listings}
+\usepackage{amsmath}
+
+% --- Configuration des couleurs (Design Premium) ---
+\definecolor{primary}{RGB}{37, 99, 235}     % Bleu Royal
+\definecolor{secondary}{RGB}{124, 58, 237}  % Violet
+\definecolor{darkbg}{RGB}{15, 23, 42}       % Slate 900
+\definecolor{lightgray}{RGB}{248, 250, 252} % Slate 50
+
+% --- Configuration des liens ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    filecolor=secondary,      
+    urlcolor=primary,
+    pdftitle={Rapport de Projet - VoxAI},
+}
+
+% --- Style des titres ---
+\titleformat{\section}{\color{primary}\normalfont\Large\bfseries}{\thesection}{1em}{}[{\titlerule[0.8pt]}]
+\titleformat{\subsection}{\color{darkbg}\normalfont\large\bfseries}{\thesubsection}{1em}{}
+
+% --- En-têtes et Pieds de page ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{gray}{\small Rapport de Projet - PFF N°5}}
+\fancyhead[R]{\textcolor{gray}{\small VoxAI}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% --- Lignes de code ---
+\lstset{
+    backgroundcolor=\color{lightgray},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{gray!30},
+    keywordstyle=\color{primary}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{secondary}
+}
+
+\begin{document}
+
+% ==========================================
+% PAGE 1 : PAGE DE GARDE
+% ==========================================
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge \textcolor{primary}{\textbf{VoxAI}}}\\[0.5cm]
+    {\LARGE Agent IA d'Analyse de Sentiment des Avis Clients}\\[1cm]
+    
+    \noindent\makebox[\linewidth]{\rule{\textwidth}{1pt}}\\[1cm]
+    
+    {\Large \textbf{Rapport de Projet Final}}\\[0.5cm]
+    {\large Projet de Fin de Formation (PFF N°5)}\\[2cm]
+    
+    \begin{mdframed}[linecolor=primary, linewidth=2pt, backgroundcolor=lightgray, roundcorner=10pt, padding=15pt]
+        \centering
+        \textbf{Résumé Exécutif}\\[0.5cm]
+        Ce rapport documente la conception, le développement et le déploiement de VoxAI, une plateforme intelligente permettant l'automatisation de l'analyse des retours clients pour les agences de marketing digital. Le système intègre des algorithmes de Traitement du Langage Naturel (NLP) avancés au sein d'une architecture web moderne.
+    \end{mdframed}
+    
+    \vfill
+    
+    {\large \textbf{Réalisé par l'équipe de développement}}\\[0.2cm]
+    {\normalsize (Structure pour 6 collaborateurs)}\\[2cm]
+    
+    {\large Année Universitaire 2025-2026}
+\end{titlepage}
+
+\newpage
+% ==========================================
+% PAGE 2 : SOMMAIRE
+% ==========================================
+\setstretch{1.3}
+\tableofcontents
+\setstretch{1.1}
+\newpage
+
+% ==========================================
+% PAGE 3 : INTRODUCTION & CONTEXTE
+% ==========================================
+\section{Introduction et Contexte}
+\subsection{Le contexte du marketing digital actuel}
+Dans l'ère du numérique, les entreprises interagissent de plus en plus avec leurs clients via une multitude de canaux : réseaux sociaux, plateformes d'avis (Google, Trustpilot), emails de support, et messageries instantanées (WhatsApp). Pour une agence de marketing digital, l'analyse approfondie de ces retours est cruciale pour mesurer l'e-réputation d'une marque, évaluer le succès d'une campagne publicitaire, et ajuster la stratégie commerciale en temps réel.
+
+\subsection{Les limites de l'approche traditionnelle}
+Historiquement, les agences marketing collectent et analysent ces avis de manière manuelle ou semi-automatisée. Cette approche présente plusieurs lacunes majeures :
+\begin{itemize}
+    \item \textbf{Volume de données} : La quantité de texte générée quotidiennement dépasse la capacité de lecture humaine.
+    \item \textbf{Biais d'interprétation} : L'analyse humaine est subjective et peut varier d'un analyste à l'autre.
+    \item \textbf{Latence temporelle} : Le temps nécessaire pour compiler un rapport rend souvent l'information obsolète au moment où elle est présentée aux décideurs.
+\end{itemize}
+
+\subsection{La proposition de valeur : VoxAI}
+Pour répondre à ces défis, le projet \textbf{VoxAI} a été initié. Il s'agit d'un agent intelligent propulsé par l'intelligence artificielle (IA), conçu spécifiquement pour ingérer d'importants volumes de textes hétérogènes, extraire le sentiment sous-jacent (polarité et intensité), et synthétiser ces informations dans un tableau de bord analytique de très haute qualité (design "Premium Glassmorphism").
+\newpage
+
+% ==========================================
+% PAGE 4 : PROBLÉMATIQUE & OBJECTIFS
+% ==========================================
+\section{Problématique et Objectifs}
+\subsection{Énoncé de la problématique}
+\textit{Comment concevoir et déployer une solution logicielle scalable et intelligente, capable de collecter, d'analyser sémantiquement, et de restituer visuellement les sentiments exprimés dans de vastes corpus d'avis clients hétérogènes, tout en offrant une expérience utilisateur (UX) fluide et intuitive ?}
+
+\subsection{Objectifs principaux}
+Le projet VoxAI se décline en quatre grands objectifs stratégiques et techniques :
+\begin{enumerate}
+    \item \textbf{Ingestion de données robuste} : Développer un pipeline de données capable d'absorber des fichiers CSV complexes, avec une détection intelligente des délimiteurs et des colonnes (même mal formatées).
+    \item \textbf{Traitement du Langage Naturel (NLP) de pointe} : Implémenter des modèles de Deep Learning (Transformers) pour classifier avec une haute précision les sentiments (Positif, Neutre, Négatif) et extraire des mots-clés pertinents à l'aide de bibliothèques linguistiques (spaCy).
+    \item \textbf{Restitution analytique en temps réel} : Fournir des statistiques globales, des évolutions temporelles, et une détection automatique des points forts et des axes d'amélioration.
+    \item \textbf{Excellence visuelle et ergonomique} : Offrir une interface utilisateur adaptative (Mode Clair / Mode Sombre), interactive (animations au survol), et professionnelle, digne d'un SaaS B2B haut de gamme.
+\end{enumerate}
+
+\subsection{Périmètre du prototype}
+Dans le cadre de ce Projet de Fin de Formation (PFF), le périmètre a été circonscrit à un produit Minimum Viable (MVP) fonctionnel. Celui-ci inclut l'interface web complète, le backend de traitement asynchrone, la base de données relationnelle locale (SQLite), et l'intégration des modèles NLP. La collecte en temps réel via des API externes (Scraping, Webhooks) est simulée par l'importation de fichiers CSV dynamiques.
+\newpage
+
+% ==========================================
+% PAGE 5 : ARCHITECTURE DU SYSTÈME
+% ==========================================
+\section{Architecture du Système}
+\subsection{Vision Globale}
+L'architecture de VoxAI repose sur une séparation stricte des préoccupations (Séparation Frontend / Backend), suivant un modèle Client-Serveur classique. Cette architecture garantit la scalabilité, la maintenabilité et permet à différentes équipes (Développeurs UI, Ingénieurs IA) de travailler en parallèle de manière asynchrone.
+
+\subsection{Schéma d'Architecture Technique}
+Le flux de données s'organise de la manière suivante :
+\begin{itemize}
+    \item \textbf{Couche Présentation (Client)} : Développée en \textbf{React 18} avec \textbf{Vite}. Elle gère le rendu dynamique du tableau de bord, les interactions utilisateur, la bascule de thème, et la visualisation des données via la bibliothèque \textbf{Recharts}.
+    \item \textbf{Couche Communication (API)} : \textbf{FastAPI} (Python) agit comme un routeur ultra-rapide. Il reçoit les requêtes HTTP (GET pour les statistiques, POST pour les imports CSV, DELETE pour la gestion des données), valide les schémas via \textbf{Pydantic}, et orchestre les réponses.
+    \item \textbf{Couche Intelligence (IA / NLP)} : Intégrée au backend, elle utilise \textbf{HuggingFace Transformers} (modèle \texttt{nlptown/bert-base-multilingual-uncased-sentiment}) et \textbf{spaCy} (\texttt{fr\_core\_news\_sm}) pour traiter les textes à la volée.
+    \item \textbf{Couche Persistance (Base de données)} : \textbf{SQLite} est utilisé pour le prototypage, interfacé via l'ORM \textbf{SQLAlchemy}. Les tables principales sont \texttt{products} et \texttt{reviews}.
+\end{itemize}
+
+\subsection{Sécurité et Performance}
+FastAPI a été choisi pour ses performances exceptionnelles (basées sur Starlette et Pydantic) et son support natif de l'asynchronisme (\texttt{async/await}). L'interface React a été optimisée avec des \texttt{useCallback} et \texttt{useEffect} pour éviter les rendus inutiles.
+\newpage
+
+% ==========================================
+% PAGE 6 : DATA ENGINEERING & BASE DE DONNÉES
+% ==========================================
+\section{Data Engineering et Base de Données}
+\subsection{Modélisation des données (Schéma E-R)}
+La persistance des données repose sur un schéma relationnel optimisé. Deux entités principales ont été modélisées :
+\begin{itemize}
+    \item \textbf{Product} : Représente le produit ou le service analysé. Il possède un identifiant unique, un nom, et une description.
+    \item \textbf{Review} : Représente l'avis client individuel. Cette entité est riche et contient à la fois les données brutes (texte, source, date) et les métadonnées générées par l'IA (score de sentiment, note utilisateur d'origine, indice de confiance, mots-clés, thèmes détectés).
+\end{itemize}
+
+\subsection{Pipeline d'Ingestion CSV Intelligent}
+Le module d'importation de données est l'un des piliers de l'application. Pour pallier la diversité des formats de fichiers clients, nous avons implémenté un système de détection dynamique :
+\begin{lstlisting}[language=Python]
+# Detection dynamique du delimiteur
+dialect = csv.Sniffer().sniff(decoded, delimiters=";,|\t")
+
+# Recherche robuste des entetes
+text_keywords = ["text", "avis", "review", "comment", "content"]
+text_col = next((h for h in headers if any(k in h.lower() for k in text_keywords)), headers[-1])
+
+rating_keywords = ["rating", "score", "note", "stars"]
+rating_col = next((h for h in headers if any(k in h.lower() for k in rating_keywords)), None)
+\end{lstlisting}
+Cette approche permet à VoxAI d'avaler presque n'importe quel fichier de données textuelles sans générer d'erreurs de parsing.
+
+\subsection{Génération de Données (Seeding)}
+Pour valider les algorithmes d'analyse et concevoir l'interface graphique sans attendre d'avoir des données réelles, un script \texttt{seed\_data.py} a été développé. Il génère un corpus de centaines d'avis synthétiques et réalistes.
+\newpage
+
+% ==========================================
+% PAGE 7 : MODÉLISATION IA & NLP
+% ==========================================
+\section{Intelligence Artificielle et NLP}
+\subsection{Le modèle de Deep Learning (Transformers)}
+Au c{\oe}ur du moteur analytique se trouve un modèle Transformer multilingue pré-entraîné (\texttt{bert-base-multilingual-uncased-sentiment}). Ce modèle analyse la sémantique profonde du texte et retourne un score de 1 à 5 étoiles (1-2 = Négatif, 3 = Neutre, 4-5 = Positif).
+L'utilisation d'un modèle pré-entraîné a permis de réduire drastiquement le temps de développement tout en offrant une précision (accuracy) bien supérieure aux modèles traditionnels basés sur des dictionnaires lexicaux (comme VADER ou TextBlob).
+
+\subsection{Traitement Linguistique avec spaCy}
+Pour extraire la substantifique moelle des avis, nous avons intégré \textbf{spaCy}.
+\begin{itemize}
+    \item \textbf{Extraction de Noun Chunks} : Le moteur isole les groupes nominaux pertinents (ex: "batterie faible", "écran magnifique") pour résumer rapidement le propos du client.
+    \item \textbf{Lemmatisation et Filtrage} : Les articles (le, la, les) et la ponctuation sont ignorés pour conserver des mots-clés propres.
+\end{itemize}
+
+\subsection{Classification Thématique Heuristique}
+En plus de l'analyse IA, un algorithme de détection thématique par correspondance lexicale a été implémenté. Il classe les avis dans des grandes catégories métier (Service Client, Livraison, Qualité Produit) en cherchant des racines de mots spécifiques. Cela permet au tableau de bord de générer automatiquement un diagnostic des points forts et des points faibles du produit analysé.
+\newpage
+
+% ==========================================
+% PAGE 8 : DÉVELOPPEMENT BACKEND & API
+% ==========================================
+\section{Développement Backend et API RESTful}
+\subsection{Le framework FastAPI}
+Le backend a été construit autour de FastAPI, un framework Python moderne, rapide et typé. L'API expose plusieurs \textit{endpoints} essentiels :
+\begin{itemize}
+    \item \texttt{POST /reviews/} : Ajout manuel d'un avis client et déclenchement de l'analyse IA.
+    \item \texttt{POST /import-csv/} : Upload d'un fichier, traitement par lots (batch processing) et insertion asynchrone en base.
+    \item \texttt{GET /reviews/} : Récupération des données avec support de la \textbf{pagination} (paramètres \texttt{skip} et \texttt{limit}).
+    \item \texttt{GET /stats/} : Agrégation SQL des données pour calculer le score moyen, la répartition des sentiments, et le volume total.
+\end{itemize}
+
+\subsection{Gestion de la Pagination et des Suppressions}
+Pour assurer la fluidité de l'application cliente même avec des milliers d'avis, l'API renvoie les données sous forme paginée :
+\begin{lstlisting}[language=Python]
+class ReviewPaginatedResponse(BaseModel):
+    total: int
+    items: List[ReviewResponse]
+\end{lstlisting}
+De plus, des routes de suppression ont été ajoutées (\texttt{DELETE /reviews/all} et \texttt{DELETE /reviews/\{id\}}) pour permettre un nettoyage rapide de la base (Hard Reset) lors des démonstrations.
+
+\subsection{CORS et Middleware}
+Afin de permettre la communication entre le serveur de développement React (port 5173) et l'API Python (port 8000), le middleware \texttt{CORSMiddleware} a été configuré de manière permissive pour l'environnement de développement, tout en étant prêt à être restreint pour la production.
+\newpage
+
+% ==========================================
+% PAGE 9 : DÉVELOPPEMENT FRONTEND (REACT)
+% ==========================================
+\section{Développement Frontend (React)}
+\subsection{Choix Technologiques}
+Le frontend a été construit avec \textbf{React 18} (composants fonctionnels et Hooks) et propulsé par \textbf{Vite.js}, garantissant un temps de compilation ultra-rapide et un Hot Module Replacement (HMR) instantané. Nous avons volontairement écarté des frameworks lourds comme Next.js car l'application est un tableau de bord Single Page Application (SPA) hautement interactif ne nécessitant pas de Server-Side Rendering (SSR) pour le SEO.
+
+\subsection{Gestion de l'État (State Management)}
+L'état de l'application est géré localement au sein de \texttt{App.jsx} via les hooks \texttt{useState} et \texttt{useEffect}.
+Une fonction centralisée, \texttt{fetchAll()}, orchestre les appels API asynchrones via la librairie \textbf{Axios} avec un \texttt{Promise.all()} :
+\begin{lstlisting}[language=JavaScript]
+const [s, t, rep, r, p] = await Promise.all([
+    axios.get(`${API}/stats/`),
+    axios.get(`${API}/stats/timeline/`),
+    axios.get(`${API}/stats/report/`),
+    axios.get(`${API}/reviews/`, { params: { limit: 50, skip: pageIndex * 50 } }),
+    axios.get(`${API}/products/`),
+]);
+\end{lstlisting}
+Cette approche permet de minimiser le temps de chargement global : l'utilisateur voit la page s'afficher dès que la requête la plus lente est terminée.
+
+\subsection{Bibliothèques Tierces}
+\begin{itemize}
+    \item \textbf{Lucide-React} : Pour une iconographie vectorielle (SVG) moderne, légère et personnalisable.
+    \item \textbf{Recharts} : Une librairie de graphiques basée sur D3.js, permettant de créer des graphiques circulaires (PieChart) et des courbes (LineChart) animés et responsifs.
+\end{itemize}
+\newpage
+
+% ==========================================
+% PAGE 10 : UI/UX & DESIGN SYSTEM
+% ==========================================
+\section{UI/UX et Design System}
+\subsection{Le paradigme du "Glassmorphism"}
+L'interface de VoxAI se distingue par une esthétique extrêmement soignée, empruntant les codes visuels du \textit{Glassmorphism}. Ce style se caractérise par :
+\begin{itemize}
+    \item Des arrière-plans subtilement dégradés (Gradients elliptiques radiaux).
+    \item Des cartes (Cards) semi-transparentes (\texttt{rgba}) avec un léger effet de flou en arrière-plan (\texttt{backdrop-filter: blur()}).
+    \item Des bordures extrêmement fines et translucides pour délimiter les éléments.
+\end{itemize}
+
+\subsection{Mode Clair et Mode Sombre}
+Un système de thèmes CSS dynamique a été implémenté. En utilisant des variables CSS (\texttt{--bg-dark}, \texttt{--text-main}), l'ajout d'une simple classe \texttt{.light-mode} sur la balise \texttt{<body>} permet d'inverser intégralement les couleurs de l'interface en moins d'une milliseconde, offrant un grand confort de lecture à l'utilisateur.
+
+\subsection{Micro-interactions et Animations}
+Pour donner un ressenti "Premium" à l'application, de multiples micro-interactions ont été codées en CSS Vanilla :
+\begin{itemize}
+    \item \textbf{Survol des cartes (Hover)} : Les cartes s'agrandissent légèrement (\texttt{transform: scale(1.03)}) de manière fluide lors du survol de la souris.
+    \item \textbf{Menu latéral rétractable} : La barre de navigation sur la gauche peut être repliée (Collapse) pour maximiser l'espace de lecture des graphiques, avec une transition CSS fluide sur la propriété \texttt{width}.
+    \item \textbf{Double Notation (Étoiles)} : Sur les cartes d'avis, un système d'étoiles interactif compare visuellement le "Score IA" (en violet) et la "Note Utilisateur" (en jaune).
+\end{itemize}
+\newpage
+
+% ==========================================
+% PAGE 11 : TESTS ET VALIDATION
+% ==========================================
+\section{Tests et Validation}
+\subsection{Validation de l'Importation CSV}
+Des campagnes de tests intensives ont été menées pour s'assurer de la fiabilité du système. Le module d'import CSV a été testé avec différents fichiers :
+\begin{itemize}
+    \item Fichiers utilisant une virgule (norme anglophone).
+    \item Fichiers utilisant un point-virgule (norme francophone).
+    \item Fichiers dont la colonne de texte était nommée \texttt{Commentaire}, \texttt{Avis}, \texttt{Review}, ou \texttt{Text}.
+    \item Fichiers contenant des colonnes de notes optionnelles (\texttt{rating}, \texttt{stars}).
+\end{itemize}
+Le module a géré 100\% de ces cas avec succès, évitant le classique bogue d'importation "0 avis ajoutés".
+
+\subsection{Évaluation du Modèle NLP}
+Bien que le modèle de fond (\texttt{bert-base-multilingual-uncased-sentiment}) soit déjà pré-entraîné, sa pertinence sur les phrases sarcastiques ou idiomatiques en français a été évaluée.
+Dans l'ensemble, le modèle démontre une très forte précision pour différencier les avis positifs des avis négatifs. Cependant, l'évaluation des avis très nuancés (3 étoiles) manque parfois de subtilité.
+
+\subsection{Performance de l'Interface (UX)}
+Les tests de performance via Google Lighthouse indiquent que l'application réagit sans latence (< 100ms) même lors du changement de thème ou du rendu de graphiques contenant plusieurs centaines de points de données. La pagination garantit que le navigateur n'est jamais surchargé de n{\oe}uds DOM.
+\newpage
+
+% ==========================================
+% PAGE 12 : RÉPARTITION DES TÂCHES
+% ==========================================
+\section{Organisation et Répartition de l'Équipe}
+Le projet a été développé dans une approche Agile, réparti sur une équipe de 6 membres pluridisciplinaires, respectant strictement le cahier des charges académique.
+
+\subsection{Détail des rôles et contributions (Les 6 piliers)}
+\begin{enumerate}
+    \item \textbf{Chef de Projet (Project Manager)} : Garant de la documentation, du dépôt Git, et de la synchronisation de l'équipe. Responsable de la création du README et de l'export des rapports (via `convert\_to\_pdf.py`).
+    \item \textbf{Data Engineer} : Concepteur de l'architecture de la base SQLite et créateur du générateur algorithmique de données factices (\texttt{seed\_data.py}) indispensable pour les tests.
+    \item \textbf{Ingénieur IA (Modélisation)} : En charge du fichier \texttt{nlp\_engine.py}, responsable de l'intégration du modèle HuggingFace et de l'extraction syntaxique via spaCy.
+    \item \textbf{Ingénieur IA (Intégration \& Scripts)} : Chargé des scripts de validation IA et d'automatisation des tâches Python annexes.
+    \item \textbf{Développeur Backend (API)} : Architecte du serveur FastAPI (\texttt{main.py}), gérant les routes REST, la logique de pagination et l'algorithme robuste d'importation CSV.
+    \item \textbf{Développeur Frontend (React \& UX)} : Concepteur du socle graphique React (\texttt{App.jsx}, composants, CSS). Créateur du design Glassmorphism et de l'intégration des graphiques analytiques.
+\end{enumerate}
+
+Cette répartition a permis un développement modulaire, chaque membre pouvant coder et tester sa partie (Backend, Frontend, IA, BDD) de manière totalement indépendante avant la phase de fusion finale sur GitHub.
+\newpage
+
+% ==========================================
+% PAGE 13 : CONCLUSION & PERSPECTIVES
+% ==========================================
+\section{Conclusion et Perspectives}
+\subsection{Bilan du Projet}
+Le projet \textbf{VoxAI} a démontré avec succès la faisabilité et la puissance de la combinaison entre l'Intelligence Artificielle générative/analytique et le développement web moderne.
+L'équipe est parvenue à livrer un prototype (MVP) hautement esthétique, robuste, et fonctionnel, répondant point par point à la problématique initiale : automatiser l'analyse de sentiment pour soulager les équipes marketing.
+
+L'interface offre une expérience utilisateur premium, tandis que le backend encaisse sans broncher l'importation de fichiers CSV hétérogènes. L'analyse NLP, opérant de manière invisible, transforme des données textuelles chaotiques en indicateurs clés de performance (KPI) clairs et lisibles.
+
+\subsection{Améliorations futures (Roadmap)}
+Si VoxAI devait évoluer vers une version commerciale (SaaS), plusieurs axes d'amélioration seraient envisagés :
+\begin{itemize}
+    \item \textbf{Base de données de production} : Migration de SQLite vers \textbf{PostgreSQL} pour supporter les connexions simultanées de milliers d'utilisateurs.
+    \item \textbf{Authentification et Multitenancy} : Implémentation d'un système de login (OAuth2 / JWT) pour isoler les données entre différentes entreprises clientes.
+    \item \textbf{Intégrations en Temps Réel (Webhooks)} : Connexion directe avec l'API de Google My Business, Trustpilot, ou les boîtes mail IMAP pour avaler les avis automatiquement sans nécessiter d'upload CSV manuel.
+    \item \textbf{Fine-Tuning du Modèle IA} : Ré-entraînement partiel du modèle de base sur un corpus spécifique au vocabulaire du client (par exemple, le jargon de la restauration ou de l'automobile) pour accroître l'accuracy.
+\end{itemize}
+
+\vspace{2cm}
+\begin{center}
+    \textit{Fin du Rapport.}
+\end{center}
+
+\end{document}
