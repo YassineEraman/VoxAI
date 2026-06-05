@@ -242,6 +242,16 @@ function DashboardPage({ stats, timeline, report, reviews, loading, fetchAll, on
 /* ===== REVIEWS PAGE ===== */
 function ReviewsPage({ reviews, loading, fetchAll, onAdd, onCsv, onDeleteAll, onDeleteReview, pageIndex, setPageIndex, totalReviews }) {
   const totalPages = Math.ceil(totalReviews / 50);
+  const [filter, setFilter] = React.useState('Tous');
+
+  const filtered = filter === 'Tous' ? reviews : reviews.filter(r => r.sentiment === filter);
+
+  const filterBtns = [
+    { label: 'Tous', value: 'Tous', color: 'var(--accent-blue)' },
+    { label: 'Positif', value: 'Positif', color: 'var(--color-positive)' },
+    { label: 'Neutre', value: 'Neutre', color: 'var(--color-neutral)' },
+    { label: 'Négatif', value: 'Négatif', color: 'var(--color-negative)' },
+  ];
 
   return (
     <div className="fade-in">
@@ -257,9 +267,32 @@ function ReviewsPage({ reviews, loading, fetchAll, onAdd, onCsv, onDeleteAll, on
           <button className="btn btn-primary" onClick={onAdd}><Plus size={16} /> Nouvel Avis</button>
         </div>
       </div>
+
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+        {filterBtns.map(f => (
+          <button
+            key={f.value}
+            onClick={() => setFilter(f.value)}
+            style={{
+              padding: '0.45rem 1.1rem',
+              borderRadius: '999px',
+              border: filter === f.value ? `2px solid ${f.color}` : '2px solid var(--border-color)',
+              background: filter === f.value ? f.color : 'transparent',
+              color: filter === f.value ? '#fff' : 'var(--text-secondary)',
+              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: '0.82rem',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {f.label} {f.value !== 'Tous' && `(${reviews.filter(r => r.sentiment === f.value).length})`}
+          </button>
+        ))}
+      </div>
+
       <div className="reviews-grid">
-        {reviews.map(r => <ReviewCard key={r.id} review={r} onDelete={() => onDeleteReview(r.id)} />)}
-        {reviews.length === 0 && <p style={{ color: 'var(--text-muted)' }}>Aucun avis pour le moment.</p>}
+        {filtered.map(r => <ReviewCard key={r.id} review={r} onDelete={() => onDeleteReview(r.id)} />)}
+        {filtered.length === 0 && <p style={{ color: 'var(--text-muted)' }}>Aucun avis {filter !== 'Tous' ? `"${filter}"` : ''} pour le moment.</p>}
       </div>
       
       {totalPages > 1 && (
