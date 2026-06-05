@@ -98,6 +98,49 @@ def detect_themes(text: str) -> list[str]:
     return detected
 
 
+def detect_double_negation(text: str) -> bool:
+    """
+    Détecte les doubles négations en français.
+    Exemples : "pas insatisfait", "pas mauvais", "jamais déçu", "ne regrette pas"
+    Retourne True si une double négation est détectée (= sens positif).
+    """
+    if not text:
+        return False
+
+    text_lower = text.lower()
+
+    # Mots négatifs (négation)
+    negation_words = ["pas", "jamais", "plus", "aucun", "aucune", "ni", "sans", "rien"]
+    # Mots à polarité négative (si niés = positif)
+    negative_words = [
+        "insatisfait", "insatisfaite", "mécontent", "mécontente",
+        "déçu", "déçue", "mauvais", "mauvaise", "mal",
+        "horrible", "terrible", "nul", "nulle",
+        "pire", "décevant", "décevante", "problème", "problèmes",
+        "défaut", "défauts", "ennuyeux", "ennuyeuse",
+        "lent", "lente", "inutile", "difficile",
+        "compliqué", "compliquée", "regret", "regrette",
+        "insupportable", "inadmissible", "inacceptable",
+        "insuffisant", "insuffisante", "incompétent", "incompétente",
+        "désagréable", "frustrant", "frustrante",
+        "unhappy", "dissatisfied", "bad", "poor", "terrible",
+        "horrible", "worst", "disappointed", "disappointing",
+    ]
+
+    # Cherche un mot de négation suivi (dans les 4 mots) d'un mot négatif
+    words = text_lower.split()
+    for i, word in enumerate(words):
+        if word in negation_words:
+            # Regarde les 4 mots suivants
+            window = words[i+1:i+5]
+            for w in window:
+                # Nettoyer la ponctuation
+                clean_w = w.strip(".,!?;:'\"()[]")
+                if clean_w in negative_words:
+                    return True
+    return False
+
+
 def analyze_sentiment(text: str) -> dict:
     """
     Analyse complète d'un avis :
@@ -106,6 +149,9 @@ def analyze_sentiment(text: str) -> dict:
       - confidence (0-1)
       - keywords (liste -> str)
       - themes  (liste -> str)
+
+    Inclut un post-traitement pour détecter les doubles négations
+    (ex: "pas insatisfait" = Positif).
     """
     result = {
         "sentiment": "Neutre",
@@ -124,6 +170,13 @@ def analyze_sentiment(text: str) -> dict:
             res = sentiment_analyzer(text[:512])[0]
             score_val = int(res["label"].split()[0])  # "4 stars" -> 4
             confidence = round(res["score"], 3)
+
+            # --- Post-traitement : Double Négation ---
+            has_double_neg = detect_double_negation(text)
+            if has_double_neg:
+                # Inverser le score : 1->5, 2->4, 4->2, 5->1, 3 reste 3
+                score_val = 6 - score_val
+                logger.info(f"Double négation détectée, score inversé -> {score_val} | texte: {text[:80]}")
 
             result["score"] = score_val
             result["confidence"] = confidence
