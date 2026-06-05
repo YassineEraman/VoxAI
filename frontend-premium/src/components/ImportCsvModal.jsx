@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { X, Upload, Loader2, FileText } from 'lucide-react';
+import { X, Upload, Loader2, FileText, Plus } from 'lucide-react';
 
 export default function ImportCsvModal({ products, apiUrl, onClose, onDone }) {
   const [file, setFile] = useState(null);
