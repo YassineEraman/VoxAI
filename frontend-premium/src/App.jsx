@@ -333,79 +333,113 @@ function ReportPage({ stats, timeline, report, reviews }) {
     const now = new Date();
     const dateStr = now.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
     const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const posPercent = total > 0 ? ((sentiments['Positif'] || 0) / total * 100).toFixed(1) : '0.0';
+    const neuPercent = total > 0 ? ((sentiments['Neutre'] || 0) / total * 100).toFixed(1) : '0.0';
+    const negPercent = total > 0 ? ((sentiments['Négatif'] || 0) / total * 100).toFixed(1) : '0.0';
+    const scoreEmoji = avg >= 4 ? '\u{1F7E2}' : avg >= 3 ? '\u{1F7E1}' : '\u{1F534}';
+    const scoreLabel = avg >= 4 ? 'Excellent' : avg >= 3 ? 'Correct' : 'À améliorer';
 
-    const sentimentRows = Object.entries(sentiments).map(([k, v]) =>
-      `<tr><td>${k}</td><td style="text-align:center">${v}</td><td style="text-align:center">${(v / total * 100).toFixed(1)}%</td></tr>`
-    ).join('');
+    const sentimentRows = Object.entries(sentiments).map(([k, v]) => {
+      const pct = total > 0 ? (v / total * 100).toFixed(1) : '0.0';
+      const color = k === 'Positif' ? '#22c55e' : k === 'Négatif' ? '#ef4444' : '#eab308';
+      return '<tr><td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + color + ';margin-right:8px"></span>' + k + '</td><td style="text-align:center;font-weight:600">' + v + '</td><td style="text-align:center">' + pct + '%</td><td><div style="background:#f1f5f9;border-radius:8px;height:8px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:' + color + ';border-radius:8px"></div></div></td></tr>';
+    }).join('');
 
-    const themeRows = Object.entries(themes).map(([k, v]) =>
-      `<tr><td>${k}</td><td style="text-align:center">${v}</td></tr>`
-    ).join('') || '<tr><td colspan="2" style="color:#999">Pas assez de données</td></tr>';
+    const themeRows = Object.entries(themes).map(([k, v]) => {
+      const maxT = Math.max(...Object.values(themes));
+      const pct = maxT > 0 ? (v / maxT * 100) : 0;
+      return '<tr><td>' + k + '</td><td style="text-align:center;font-weight:600">' + v + '</td><td style="width:40%"><div style="background:#f1f5f9;border-radius:8px;height:8px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:linear-gradient(90deg,#818cf8,#a78bfa);border-radius:8px"></div></div></td></tr>';
+    }).join('') || '<tr><td colspan="3" style="color:#94a3b8;font-style:italic">Pas assez de données</td></tr>';
 
     const fortRows = Object.entries(forts).map(([k, v]) =>
-      `<tr><td>${k}</td><td style="text-align:center;color:#22c55e">${v} mentions</td></tr>`
-    ).join('') || '<tr><td colspan="2" style="color:#999">Aucun point fort détecté</td></tr>';
+      '<tr><td><span style="color:#22c55e;margin-right:6px">\u25CF</span>' + k + '</td><td style="text-align:center;color:#22c55e;font-weight:600">' + v + '</td></tr>'
+    ).join('') || '<tr><td colspan="2" style="color:#94a3b8;font-style:italic">Aucun point fort détecté</td></tr>';
 
     const amelioRows = Object.entries(amelio).map(([k, v]) =>
-      `<tr><td>${k}</td><td style="text-align:center;color:#ef4444">${v} mentions</td></tr>`
-    ).join('') || '<tr><td colspan="2" style="color:#999">Aucun point d\'amélioration détecté</td></tr>';
+      '<tr><td><span style="color:#ef4444;margin-right:6px">\u25CF</span>' + k + '</td><td style="text-align:center;color:#ef4444;font-weight:600">' + v + '</td></tr>'
+    ).join('') || '<tr><td colspan="2" style="color:#94a3b8;font-style:italic">Aucun point d\'amélioration détecté</td></tr>';
 
-    const topReviews = (reviews || []).slice(0, 10).map((r, i) =>
-      `<tr><td style="text-align:center">${i + 1}</td><td>${r.text?.substring(0, 120)}${r.text?.length > 120 ? '…' : ''}</td><td style="text-align:center"><span style="padding:2px 10px;border-radius:12px;font-size:0.8rem;background:${r.sentiment === 'Positif' ? '#dcfce7;color:#16a34a' : r.sentiment === 'Négatif' ? '#fef2f2;color:#dc2626' : '#fefce8;color:#ca8a04'}">${r.sentiment}</span></td><td style="text-align:center">${r.ai_score?.toFixed(1) || '—'}</td></tr>`
-    ).join('');
+    const topReviews = (reviews || []).slice(0, 15).map((r, i) => {
+      const bg = r.sentiment === 'Positif' ? '#dcfce7' : r.sentiment === 'Négatif' ? '#fef2f2' : '#fefce8';
+      const fg = r.sentiment === 'Positif' ? '#16a34a' : r.sentiment === 'Négatif' ? '#dc2626' : '#ca8a04';
+      return '<tr><td style="text-align:center;color:#94a3b8;font-weight:600">' + (i + 1) + '</td><td style="font-size:0.82rem;line-height:1.4">' + (r.text || '').substring(0, 140) + (r.text?.length > 140 ? '\u2026' : '') + '</td><td style="text-align:center"><span style="padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;background:' + bg + ';color:' + fg + '">' + r.sentiment + '</span></td><td style="text-align:center;font-weight:600">' + (r.ai_score?.toFixed(1) || '\u2014') + '/5</td></tr>';
+    }).join('');
 
-    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>VoxAI — Rapport d'Analyse</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Inter', sans-serif; color: #1e293b; padding: 48px; line-height: 1.6; background: #fff; }
-  .cover { text-align: center; margin-bottom: 40px; padding-bottom: 32px; border-bottom: 3px solid #2563eb; }
-  .cover h1 { font-size: 2.2rem; color: #2563eb; margin-bottom: 4px; }
-  .cover .subtitle { font-size: 1.1rem; color: #64748b; }
-  .cover .meta { margin-top: 16px; font-size: 0.85rem; color: #94a3b8; }
-  h2 { font-size: 1.15rem; color: #2563eb; margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
-  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.9rem; }
-  th { background: #f1f5f9; color: #475569; text-align: left; padding: 10px 14px; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
-  td { padding: 9px 14px; border-bottom: 1px solid #f1f5f9; }
-  tr:hover { background: #f8fafc; }
-  .kpi-row { display: flex; gap: 16px; margin-bottom: 24px; }
-  .kpi { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; text-align: center; }
-  .kpi .value { font-size: 1.8rem; font-weight: 700; color: #2563eb; }
-  .kpi .label { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
-  .footer { margin-top: 40px; text-align: center; font-size: 0.75rem; color: #cbd5e1; border-top: 1px solid #f1f5f9; padding-top: 16px; }
-  @media print { body { padding: 24px; } .no-print { display: none; } }
-</style></head><body>
-  <div class="cover">
-    <h1>🎤 VoxAI — Rapport d'Analyse de Sentiment</h1>
-    <p class="subtitle">Analyse intelligente des avis clients propulsée par l'Intelligence Artificielle</p>
-    <p class="meta">Généré le ${dateStr} à ${timeStr} • ${total} avis analysés</p>
-  </div>
+    const css = [
+      '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");',
+      '@page { margin: 20mm 18mm 24mm 18mm; }',
+      '* { margin:0; padding:0; box-sizing:border-box; }',
+      'body { font-family:"Inter",-apple-system,sans-serif; color:#1e293b; line-height:1.65; background:#fff; font-size:13px; }',
+      '.cover-page { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; page-break-after:always; padding:60px 40px; }',
+      '.cover-logo { width:80px; height:80px; background:linear-gradient(135deg,#2563eb,#7c3aed); border-radius:20px; display:flex; align-items:center; justify-content:center; margin:0 auto 28px; box-shadow:0 8px 32px rgba(37,99,235,0.25); }',
+      '.cover-logo span { color:#fff; font-size:28px; font-weight:800; }',
+      '.cover-page h1 { font-size:2.4rem; font-weight:800; color:#2563eb; margin-bottom:8px; }',
+      '.cover-page .tagline { font-size:1.1rem; color:#64748b; margin-bottom:40px; max-width:500px; }',
+      '.cover-info { background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:28px 40px; margin-top:20px; min-width:400px; }',
+      '.cover-info .row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9; }',
+      '.cover-info .row:last-child { border-bottom:none; }',
+      '.cover-info .lbl { color:#94a3b8; font-size:0.85rem; }',
+      '.cover-info .val { font-weight:600; color:#1e293b; font-size:0.85rem; }',
+      '.cover-company { margin-top:48px; padding-top:28px; border-top:1px solid #e2e8f0; }',
+      '.cover-company .name { font-size:0.9rem; font-weight:600; color:#475569; }',
+      '.cover-company .desc { font-size:0.8rem; color:#94a3b8; margin-top:4px; }',
+      '.content { padding:0 8px; }',
+      '.section { page-break-inside:avoid; margin-bottom:28px; }',
+      'h2 { font-size:1.05rem; color:#1e293b; font-weight:700; margin:0 0 14px; padding:10px 16px; background:linear-gradient(90deg,#f8fafc,#fff); border-left:4px solid #2563eb; border-radius:0 8px 8px 0; }',
+      'h2 .num { color:#2563eb; margin-right:6px; }',
+      '.kpi-row { display:flex; gap:14px; margin-bottom:28px; page-break-inside:avoid; }',
+      '.kpi { flex:1; background:linear-gradient(135deg,#f8fafc,#fff); border:1px solid #e2e8f0; border-radius:14px; padding:20px 12px; text-align:center; }',
+      '.kpi .icon { font-size:1.4rem; margin-bottom:4px; }',
+      '.kpi .value { font-size:1.7rem; font-weight:800; color:#2563eb; }',
+      '.kpi .label { font-size:0.68rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-top:4px; }',
+      '.kpi.positive .value { color:#22c55e; } .kpi.negative .value { color:#ef4444; } .kpi.score .value { color:#7c3aed; }',
+      'table { width:100%; border-collapse:separate; border-spacing:0; margin-bottom:6px; font-size:0.85rem; border-radius:10px; overflow:hidden; border:1px solid #e2e8f0; }',
+      'thead th { background:#f1f5f9; color:#475569; text-align:left; padding:10px 14px; font-weight:600; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.3px; }',
+      'td { padding:10px 14px; border-top:1px solid #f1f5f9; }',
+      '.verdict { page-break-inside:avoid; background:linear-gradient(135deg,#eff6ff,#f5f3ff); border:1px solid #dbeafe; border-radius:14px; padding:24px; margin-bottom:28px; text-align:center; }',
+      '.verdict h3 { font-size:1rem; color:#1e293b; margin-bottom:8px; }',
+      '.verdict .score-big { font-size:2.2rem; font-weight:800; color:#2563eb; }',
+      '.page-footer { margin-top:32px; text-align:center; font-size:0.7rem; color:#cbd5e1; border-top:1px solid #f1f5f9; padding-top:16px; page-break-inside:avoid; }',
+      '.page-footer .brand { font-weight:600; color:#94a3b8; }',
+      '@media print { .section{page-break-inside:avoid} table{page-break-inside:avoid} .kpi-row{page-break-inside:avoid} .verdict{page-break-inside:avoid} tr{page-break-inside:avoid} }',
+    ].join(' ');
 
-  <h2>📊 Indicateurs Clés (KPI)</h2>
-  <div class="kpi-row">
-    <div class="kpi"><div class="value">${total}</div><div class="label">Total Avis</div></div>
-    <div class="kpi"><div class="value">${avg.toFixed(1)}/5</div><div class="label">Score Moyen</div></div>
-    <div class="kpi"><div class="value">${sentiments['Positif'] || 0}</div><div class="label">Positifs</div></div>
-    <div class="kpi"><div class="value">${sentiments['Négatif'] || 0}</div><div class="label">Négatifs</div></div>
-  </div>
+    const verdictBg = avg >= 4 ? '#dcfce7;color:#16a34a' : avg >= 3 ? '#fefce8;color:#ca8a04' : '#fef2f2;color:#dc2626';
 
-  <h2>1. Répartition des Sentiments</h2>
-  <table><thead><tr><th>Sentiment</th><th style="text-align:center">Nombre</th><th style="text-align:center">Pourcentage</th></tr></thead><tbody>${sentimentRows}</tbody></table>
+    const html = '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>VoxAI — Rapport Professionnel</title><style>' + css + '</style></head><body>' +
+    '<div class="cover-page">' +
+    '<div class="cover-logo"><span>V</span></div>' +
+    '<h1>VoxAI</h1>' +
+    '<p class="tagline">Rapport d\'Analyse de Sentiment — Intelligence Artificielle appliquée au Marketing Digital</p>' +
+    '<div class="cover-info">' +
+    '<div class="row"><span class="lbl">Date de génération</span><span class="val">' + dateStr + ' à ' + timeStr + '</span></div>' +
+    '<div class="row"><span class="lbl">Avis analysés</span><span class="val">' + total + ' avis</span></div>' +
+    '<div class="row"><span class="lbl">Score moyen</span><span class="val">' + scoreEmoji + ' ' + avg.toFixed(1) + '/5 — ' + scoreLabel + '</span></div>' +
+    '<div class="row"><span class="lbl">Moteur IA</span><span class="val">BERT Multilingual + spaCy NLP</span></div>' +
+    '</div>' +
+    '<div class="cover-company"><p class="name">Propulsé par VoxAI — Agent IA d\'Analyse de Sentiment</p><p class="desc">Projet de Fin de Formation \u2022 ESRMI \u00d7 IDS \u00d7 GIZ \u2022 2025-2026</p></div>' +
+    '</div>' +
 
-  <h2>2. Thèmes Récurrents</h2>
-  <table><thead><tr><th>Thème</th><th style="text-align:center">Occurrences</th></tr></thead><tbody>${themeRows}</tbody></table>
+    '<div class="content">' +
+    '<div class="verdict"><h3>Verdict Global de l\'Analyse</h3><div class="score-big">' + avg.toFixed(1) + ' / 5</div><div style="display:inline-block;padding:4px 16px;border-radius:20px;font-size:0.8rem;font-weight:600;margin-top:8px;background:' + verdictBg + '">' + scoreEmoji + ' ' + scoreLabel + '</div></div>' +
 
-  <h2>3. Points Forts</h2>
-  <table><thead><tr><th>Point Fort</th><th style="text-align:center">Mentions</th></tr></thead><tbody>${fortRows}</tbody></table>
+    '<div class="kpi-row">' +
+    '<div class="kpi"><div class="icon">\u{1F4CA}</div><div class="value">' + total + '</div><div class="label">Total Avis</div></div>' +
+    '<div class="kpi score"><div class="icon">\u2B50</div><div class="value">' + avg.toFixed(1) + '</div><div class="label">Score Moyen</div></div>' +
+    '<div class="kpi positive"><div class="icon">\u{1F60A}</div><div class="value">' + (sentiments['Positif'] || 0) + '</div><div class="label">Positifs (' + posPercent + '%)</div></div>' +
+    '<div class="kpi"><div class="icon">\u{1F610}</div><div class="value">' + (sentiments['Neutre'] || 0) + '</div><div class="label">Neutres (' + neuPercent + '%)</div></div>' +
+    '<div class="kpi negative"><div class="icon">\u{1F61E}</div><div class="value">' + (sentiments['Négatif'] || 0) + '</div><div class="label">Négatifs (' + negPercent + '%)</div></div>' +
+    '</div>' +
 
-  <h2>4. Points d'Amélioration</h2>
-  <table><thead><tr><th>Axe d'Amélioration</th><th style="text-align:center">Mentions</th></tr></thead><tbody>${amelioRows}</tbody></table>
+    '<div class="section"><h2><span class="num">01</span> Répartition des Sentiments</h2><table><thead><tr><th>Sentiment</th><th style="text-align:center">Nombre</th><th style="text-align:center">%</th><th>Distribution</th></tr></thead><tbody>' + sentimentRows + '</tbody></table></div>' +
+    '<div class="section"><h2><span class="num">02</span> Thèmes Récurrents Détectés</h2><table><thead><tr><th>Thème</th><th style="text-align:center">Occurrences</th><th>Distribution</th></tr></thead><tbody>' + themeRows + '</tbody></table></div>' +
+    '<div class="section"><h2><span class="num">03</span> Points Forts Identifiés</h2><table><thead><tr><th>Point Fort</th><th style="text-align:center">Mentions</th></tr></thead><tbody>' + fortRows + '</tbody></table></div>' +
+    '<div class="section"><h2><span class="num">04</span> Axes d\'Amélioration</h2><table><thead><tr><th>Axe d\'Amélioration</th><th style="text-align:center">Mentions</th></tr></thead><tbody>' + amelioRows + '</tbody></table></div>' +
 
-  ${topReviews ? `<h2>5. Échantillon d'Avis (Top 10)</h2>
-  <table><thead><tr><th style="text-align:center">#</th><th>Avis</th><th style="text-align:center">Sentiment</th><th style="text-align:center">Score IA</th></tr></thead><tbody>${topReviews}</tbody></table>` : ''}
+    (topReviews ? '<div class="section"><h2><span class="num">05</span> Échantillon d\'Avis Analysés</h2><table><thead><tr><th style="text-align:center;width:40px">#</th><th>Contenu</th><th style="text-align:center">Sentiment</th><th style="text-align:center">Score</th></tr></thead><tbody>' + topReviews + '</tbody></table></div>' : '') +
 
-  <div class="footer">VoxAI — Agent IA d'Analyse de Sentiment pour le Marketing Digital • Projet PFF 2025-2026 • ESRMI × IDS</div>
-</body></html>`;
+    '<div class="page-footer"><p class="brand">VoxAI — Agent IA d\'Analyse de Sentiment pour le Marketing Digital</p><p>Rapport généré automatiquement le ' + dateStr + ' à ' + timeStr + ' \u2022 Projet PFF 2025-2026 \u2022 ESRMI \u00d7 IDS \u00d7 GIZ</p><p style="margin-top:6px;color:#e2e8f0">— Document confidentiel —</p></div>' +
+    '</div></body></html>';
 
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
