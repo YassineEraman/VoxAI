@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {
   MessageSquare, LayoutDashboard, FileText, Upload, Plus, RefreshCw,
-  Loader2, Package, Menu, Sun, Moon, Trash2, ChevronLeft, ChevronRight
+  Loader2, Package, Menu, Sun, Moon, Trash2, ChevronLeft, ChevronRight, Download
 } from 'lucide-react';
 
 import KpiCard from './components/KpiCard';
@@ -290,10 +290,105 @@ function ReviewsPage({ reviews, loading, fetchAll, onAdd, onCsv, onDeleteAll, on
 /* ===== REPORT PAGE ===== */
 function ReportPage({ stats, timeline, report, reviews }) {
   const total = stats?.total || 0;
+  const avg = stats?.average_score || 0;
+  const sentiments = stats?.sentiments || {};
+  const themes = report?.themes || {};
+  const forts = report?.points_forts || {};
+  const amelio = report?.points_amelioration || {};
+
+  const exportReport = () => {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+    const sentimentRows = Object.entries(sentiments).map(([k, v]) =>
+      `<tr><td>${k}</td><td style="text-align:center">${v}</td><td style="text-align:center">${(v / total * 100).toFixed(1)}%</td></tr>`
+    ).join('');
+
+    const themeRows = Object.entries(themes).map(([k, v]) =>
+      `<tr><td>${k}</td><td style="text-align:center">${v}</td></tr>`
+    ).join('') || '<tr><td colspan="2" style="color:#999">Pas assez de données</td></tr>';
+
+    const fortRows = Object.entries(forts).map(([k, v]) =>
+      `<tr><td>${k}</td><td style="text-align:center;color:#22c55e">${v} mentions</td></tr>`
+    ).join('') || '<tr><td colspan="2" style="color:#999">Aucun point fort détecté</td></tr>';
+
+    const amelioRows = Object.entries(amelio).map(([k, v]) =>
+      `<tr><td>${k}</td><td style="text-align:center;color:#ef4444">${v} mentions</td></tr>`
+    ).join('') || '<tr><td colspan="2" style="color:#999">Aucun point d\'amélioration détecté</td></tr>';
+
+    const topReviews = (reviews || []).slice(0, 10).map((r, i) =>
+      `<tr><td style="text-align:center">${i + 1}</td><td>${r.text?.substring(0, 120)}${r.text?.length > 120 ? '…' : ''}</td><td style="text-align:center"><span style="padding:2px 10px;border-radius:12px;font-size:0.8rem;background:${r.sentiment === 'Positif' ? '#dcfce7;color:#16a34a' : r.sentiment === 'Négatif' ? '#fef2f2;color:#dc2626' : '#fefce8;color:#ca8a04'}">${r.sentiment}</span></td><td style="text-align:center">${r.ai_score?.toFixed(1) || '—'}</td></tr>`
+    ).join('');
+
+    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>VoxAI — Rapport d'Analyse</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; color: #1e293b; padding: 48px; line-height: 1.6; background: #fff; }
+  .cover { text-align: center; margin-bottom: 40px; padding-bottom: 32px; border-bottom: 3px solid #2563eb; }
+  .cover h1 { font-size: 2.2rem; color: #2563eb; margin-bottom: 4px; }
+  .cover .subtitle { font-size: 1.1rem; color: #64748b; }
+  .cover .meta { margin-top: 16px; font-size: 0.85rem; color: #94a3b8; }
+  h2 { font-size: 1.15rem; color: #2563eb; margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.9rem; }
+  th { background: #f1f5f9; color: #475569; text-align: left; padding: 10px 14px; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+  td { padding: 9px 14px; border-bottom: 1px solid #f1f5f9; }
+  tr:hover { background: #f8fafc; }
+  .kpi-row { display: flex; gap: 16px; margin-bottom: 24px; }
+  .kpi { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; text-align: center; }
+  .kpi .value { font-size: 1.8rem; font-weight: 700; color: #2563eb; }
+  .kpi .label { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+  .footer { margin-top: 40px; text-align: center; font-size: 0.75rem; color: #cbd5e1; border-top: 1px solid #f1f5f9; padding-top: 16px; }
+  @media print { body { padding: 24px; } .no-print { display: none; } }
+</style></head><body>
+  <div class="cover">
+    <h1>🎤 VoxAI — Rapport d'Analyse de Sentiment</h1>
+    <p class="subtitle">Analyse intelligente des avis clients propulsée par l'Intelligence Artificielle</p>
+    <p class="meta">Généré le ${dateStr} à ${timeStr} • ${total} avis analysés</p>
+  </div>
+
+  <h2>📊 Indicateurs Clés (KPI)</h2>
+  <div class="kpi-row">
+    <div class="kpi"><div class="value">${total}</div><div class="label">Total Avis</div></div>
+    <div class="kpi"><div class="value">${avg.toFixed(1)}/5</div><div class="label">Score Moyen</div></div>
+    <div class="kpi"><div class="value">${sentiments['Positif'] || 0}</div><div class="label">Positifs</div></div>
+    <div class="kpi"><div class="value">${sentiments['Négatif'] || 0}</div><div class="label">Négatifs</div></div>
+  </div>
+
+  <h2>1. Répartition des Sentiments</h2>
+  <table><thead><tr><th>Sentiment</th><th style="text-align:center">Nombre</th><th style="text-align:center">Pourcentage</th></tr></thead><tbody>${sentimentRows}</tbody></table>
+
+  <h2>2. Thèmes Récurrents</h2>
+  <table><thead><tr><th>Thème</th><th style="text-align:center">Occurrences</th></tr></thead><tbody>${themeRows}</tbody></table>
+
+  <h2>3. Points Forts</h2>
+  <table><thead><tr><th>Point Fort</th><th style="text-align:center">Mentions</th></tr></thead><tbody>${fortRows}</tbody></table>
+
+  <h2>4. Points d'Amélioration</h2>
+  <table><thead><tr><th>Axe d'Amélioration</th><th style="text-align:center">Mentions</th></tr></thead><tbody>${amelioRows}</tbody></table>
+
+  ${topReviews ? `<h2>5. Échantillon d'Avis (Top 10)</h2>
+  <table><thead><tr><th style="text-align:center">#</th><th>Avis</th><th style="text-align:center">Sentiment</th><th style="text-align:center">Score IA</th></tr></thead><tbody>${topReviews}</tbody></table>` : ''}
+
+  <div class="footer">VoxAI — Agent IA d'Analyse de Sentiment pour le Marketing Digital • Projet PFF 2025-2026 • ESRMI × IDS</div>
+</body></html>`;
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, '_blank');
+    if (win) {
+      win.onload = () => { setTimeout(() => win.print(), 500); };
+    }
+  };
+
   return (
     <div className="fade-in">
       <div className="page-header">
         <div><h1>Rapport d'Analyse</h1><p>Synthèse automatique générée par l'agent IA — {total} avis analysés</p></div>
+        <button className="btn btn-primary" onClick={exportReport} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Download size={16} /> Exporter en PDF
+        </button>
       </div>
 
       <div className="card" style={{ marginBottom: '1.75rem' }}>
