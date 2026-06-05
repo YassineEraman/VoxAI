@@ -21,11 +21,12 @@ VoxAI est un outil d'analyse de sentiment intelligent doté d'une interface util
 
 ### 1. Lancement du Backend
 ```bash
-cd backend
 pip install -r requirements.txt
 python -m spacy download fr_core_news_sm
-python -m uvicorn main:app --host 127.0.0.1 --port 8000
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
+> ⚠️ **Important** : Lancez cette commande depuis la **racine du projet** (pas depuis le dossier `backend/`).
+
 L'API sera disponible sur : http://localhost:8000/docs
 
 ### 2. Lancement du Frontend
