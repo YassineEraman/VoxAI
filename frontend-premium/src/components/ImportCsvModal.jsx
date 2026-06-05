@@ -9,7 +9,7 @@ export default function ImportCsvModal({ products, apiUrl, onClose, onDone }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
-  const [isNewProduct, setIsNewProduct] = useState(false);
+  const [isNewProduct, setIsNewProduct] = useState(!products || products.length === 0);
   const [newProductName, setNewProductName] = useState('');
   const inputRef = useRef();
 
